@@ -38,7 +38,7 @@ class Perceptron:
             c = -(gradient * p1_intercept)
             y = gradient * x + c
 
-            plt.plot(x, y, c='c' if not last else 'm', zorder=-1, alpha=0.001 if not last else 1)
+            plt.plot(x, y, c='c' if not last else 'm', zorder=-1, alpha=0.01 if not last else 1)
 
     def plot(self):
         x1 = [i[0] for i in self.p]
