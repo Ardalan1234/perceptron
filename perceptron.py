@@ -106,8 +106,8 @@ points = data[:, 0:-1]
 labels = data[:, -1]
 
 # setup data
-x_train, x_test = np.split(points, [8, 10])[-1], np.split(points, [8, 10])[0]
-y_train, y_test = np.split(labels, [8, 10])[-1], np.split(labels, [8, 10])[0]
+x_train, x_test = np.split(points, [int(0.8 * len(data))])
+y_train, y_test = np.split(labels, [int(0.8 * len(data))])
 
 model = Perceptron({tuple(d[0]): d[-1] for d in zip(x_train, y_train)})
 w, b = model.main()
