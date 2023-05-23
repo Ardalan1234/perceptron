@@ -1,5 +1,5 @@
-# Ardalan Omidrad 
-# May 21, 2023 
+# Ardalan Omidrad
+# May 21, 2023
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,14 +15,15 @@ class Perceptron:
         self.plot_range = np.min(self.p) - 1, np.max(self.p) + 1
         self.previous_w_b = []
 
-    def hardlim(self, x):
+    @staticmethod
+    def hardlim(x):
         return 1 if x >= 0 else 0
 
-    def update(self, w_old, b_old, p, error):
+    def __update(self, w_old, b_old, p, error):
         self.w = w_old + error * p
         self.b = b_old + error
 
-    def dividing_line(self, i_range: tuple, last=False):
+    def __dividing_line(self, i_range: tuple, last=False):
 
         x = np.linspace(*self.plot_range, 10)
 
@@ -40,17 +41,17 @@ class Perceptron:
 
             plt.plot(x, y, c='c' if not last else 'm', zorder=-1, alpha=0.01 if not last else 1)
 
-    def plot(self):
+    def __plot(self):
         x1 = [i[0] for i in self.p]
         y1 = [j[1] for j in self.p]
         plt.scatter(x1, y1, s=50, c=['r' if t == 0 else 'k' for t in self.t], alpha=1)
 
-        self.dividing_line(i_range=(0, len(self.previous_w_b)))
+        self.__dividing_line(i_range=(0, len(self.previous_w_b)))
 
         plt.xlim(self.plot_range)
         plt.ylim(self.plot_range)
 
-        self.dividing_line(i_range=(-1, -2, -1), last=True)
+        self.__dividing_line(i_range=(-1, -2, -1), last=True)
         plt.show()
 
     def predict(self, point):
@@ -60,8 +61,12 @@ class Perceptron:
             predictions.append(res)
         return predictions
 
-    def accuracy(self, predictions, lbl):
+    @staticmethod
+    def accuracy(predictions, lbl):
         return np.sum(predictions == lbl) / len(lbl)
+
+    def single_prediction(self, point: [list, tuple]):
+        return self.hardlim(self.w.dot(np.array(point).T) + self.b)
 
     def main(self):
         run = True
@@ -74,31 +79,19 @@ class Perceptron:
                     continue
                 else:
                     self.previous_w_b.append((self.w, self.b))
-                    self.update(self.w, self.b, self.p[i], e)
+                    self.__update(self.w, self.b, self.p[i], e)
                     break
             else:
                 self.previous_w_b.append((self.w, self.b))
                 run = False
-        self.plot()
+
+        self.__plot()
         return self.w, self.b
 
 
-# model = Perceptron({(1, 2): 1, (-1, 2): 0, (0, -1): 0})
-# model = Perceptron({(0, 0): 1, (0, 1): 1, (-1, 0): 1, (-2, 0): 0, (-1, 1): 0, (0, 2): 0})
-# model = Perceptron({(-2, 2): 0, (0, 2): 0, (2, 2): 0, (-2, 0): 0, (2, 0): 0, (-2, -2): 1, (0, -2): 1, (2, -2): 1})
-# model = Perceptron({(-2, 2): 0, (0, 2): 1, (2, 2): 1, (-2, 0): 1, (2, 0): 1, (-2, -2): 1, (0, -2): 1, (2, -2): 1})
-# model = Perceptron({(-2, 2): 1, (0, 2): 1, (2, 2): 0, (-2, 0): 1, (2, 0): 0, (-2, -2): 1, (0, -2): 0, (2, -2): 0})
-"""
-model = Perceptron(
-    {(-1, -1): 1, (-1, -2): 1, (-1, -3): 1, (0, -1): 1, (0, -4): 1, (0, -3): 1, (-3, -3): 1, (-3, 0): 1, (-2, -1): 1,
-     (-2, 1): 1, (-2, -2): 1, (-1, 0): 1, (1, -1): 1, (2, 1): 0, (5, -1): 0, (3, 1): 0, (3, 2): 0, (3, 3): 0, (4, 1): 0,
-     (1, 2): 0, (2, -2): 1, (4, 5): 0, (1, 0): 1, (0, 1): 1, (-1, 2): 1, (0, 2): 0, (1, 3): 0, (2, 3): 0,
-     (2, 4): 0, (4, 0): 0, (4, 2): 0, (4, 4): 0, (3, 4): 0, (3, -1): 1}
-)
-"""
 # load data
 data = pd.read_csv("data.csv")
-data = np.array(data, dtype=np.int)
+data = np.array(data)
 
 np.random.shuffle(data)
 
@@ -115,4 +108,5 @@ model_predictions = model.predict(x_test)
 print(f"w: {w}\nb: {b}")
 print(f"model prediction: {model_predictions}")
 print(f"real label:       {list(y_test)}")
-print(f"accuracy:         {model.accuracy(model_predictions, y_test) * 100} %")
+print(f"accuracy:         {Perceptron.accuracy(model_predictions, y_test) * 100} %")
+print(f"prediction:       {model.single_prediction([120, 45])}")
