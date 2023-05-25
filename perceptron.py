@@ -75,9 +75,7 @@ class Perceptron:
             for i in range(len(self.p)):
                 a = self.hardlim(self.w.dot(self.p[i].T) + self.b)
                 e = self.t[i] - a
-                if e == 0:
-                    continue
-                else:
+                if e:
                     self.previous_w_b.append((self.w, self.b))
                     self.__update(self.w, self.b, self.p[i], e)
                     break
